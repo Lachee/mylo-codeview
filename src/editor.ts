@@ -32,7 +32,7 @@ export class Editor {
         console.log('fetched code', body);
 
         console.log('parent', parent);
-        if (parent != null && this.container == null) {
+        if (parent != null) {
             console.log('creating editor');
             this.createCodeContainer(parent);
         }

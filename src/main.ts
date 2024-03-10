@@ -60,8 +60,20 @@ class Extension {
         if (nonvisibleBox == null || nonvisibleBox.shadowRoot == null) 
             return false;
 
-        const nonViewableBox = nonvisibleBox.shadowRoot.querySelector('.d2l-consistent-eval-non-viewable');
-        console.log({nonvisibleBox, nonViewableBox});
+        const nonViewableBox = await new Promise<Element>((resolve, reject) => {
+            const timeout = setInterval(() => {
+                if (nonvisibleBox.shadowRoot === null) {
+                    return reject();
+                }
+
+                const nonViewableBox = nonvisibleBox.shadowRoot.querySelector('.d2l-consistent-eval-non-viewable');
+                if (nonViewableBox != null) {
+                    clearInterval(timeout);
+                    return resolve(nonViewableBox);
+                }
+            }, 100);
+        })    
+        
         if (nonViewableBox == null)
             return false;
 

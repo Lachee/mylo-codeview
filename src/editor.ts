@@ -9,42 +9,37 @@ hljs.registerLanguage('java', java);
 
 export class Editor {
 
-    url : string = '';
-    container : Element|null = null;
+    url: string = '';
+    container: Element | null = null;
 
     _loadedStyle = false;
 
-    constructor(){
+    constructor() {
     }
 
-    async reload() : Promise<void> {
+    async reload(): Promise<void> {
         const url = this.url;
         this.url = '';
         return this.load(url, this.container);
     }
 
-    async load(url : string, parent : Element|null) : Promise<void> {
+    async load(url: string, parent: Element | null): Promise<void> {
         if (this.url === url) return;
         this.url = url;
 
-        console.log('downloading file...');
+        console.log('downloading file...', url);
         const body = await fetch(url).then(r => r.text());
-        console.log('fetched code', body);
+        console.log('finished downloading');
 
-        console.log('parent', parent);
-        if (parent != null) {
-            console.log('creating editor');
+        if (parent != null)
             this.createCodeContainer(parent);
-        }
 
-        
         // If we have an editor, insert the highlighted stuff 
-        if (this.container != null) {
+        if (this.container != null)
             this.container.innerHTML = `<pre><code class="hljs">${hljs.highlightAuto(body).value}</code></pre>`;
-        }
     }
 
-    createCodeContainer(parent : Element) {
+    createCodeContainer(parent: Element) {
         parent.innerHTML = '';
 
         // Add HLJS

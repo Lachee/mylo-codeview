@@ -9,13 +9,15 @@
         "128": "images/icon-16.png"
     },
     "permissions": [
-        "activeTab", 
-        "scripting"
+        "activeTab",
+        "webNavigation",
+        "tabs"
     ],
     "content_scripts": [
         {
+            "run_at": "document_start",
             "matches": [
-                "*://*/*"
+                "https://mylo.utas.edu.au/d2l/*"
             ],
             "js": [
                 "main.js"

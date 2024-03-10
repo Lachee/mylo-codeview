@@ -90,27 +90,6 @@ class Extension {
         await this.editor.load(url, nonViewableBox);
         return true;
     }
-
-
-    onMessage(data: any) {
-        if (!('type' in data) && !('data' in data))
-            return;
-        switch (data.type) {
-            default: break;
-            case Messages.HistoryStateUpdated:
-                this.onHistoryStateUpdated(data.data);
-                break;
-            case Messages.NavigationCompleted:
-                this.onNavigationCompleted(data.data);
-                break;
-        }
-    }
-    onHistoryStateUpdated(details: chrome.webNavigation.WebNavigationTransitionCallbackDetails) {
-        console.log('on history updated : ', details);
-    }
-    onNavigationCompleted(details: chrome.webNavigation.WebNavigationFramedCallbackDetails) {
-        console.log('on navigation : ', details, findEvaluationEvidenceAssignment());
-    }
 }
 
 const extension = new Extension();

@@ -1,0 +1,31 @@
+{
+    "manifest_version": 3,
+    "name": "MyLo Code View",
+    "description": "Allows code to be inspected within MyLo",
+    "version": "1.0",
+    "icons": {
+        "16": "images/icon-16.png"
+    },
+    "permissions": [
+        "activeTab", 
+        "scripting"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*/*"
+            ],
+            "js": [
+                "main.js"
+            ]
+        }
+    ],
+    "action": {
+      "default_popup": "popup/popup.html",
+      "default_icon": "images/icon-16.png"
+    },
+    "background": {
+        "service_worker": "background.js"
+    }
+  }
+  

@@ -34,7 +34,7 @@ class Extension {
     /** Looks for the first available evaulation box and attaches an observer */
     async observeEvaluationBox(): Promise<ShadowRoot> {
         this.disconnectEvaluationBox();
-        const box = await new Promise<ShadowRoot>((resolve, reject) => {
+        const shadowRoot = await new Promise<ShadowRoot>((resolve, reject) => {
             const timeout = setInterval(() => {
                 const box = findEvaluationEvidenceAssignment();
                 if (box !== null && box.shadowRoot != null) {
@@ -45,9 +45,10 @@ class Extension {
         });
 
         console.log('found evaluation box');
-        this._evaluationBox = box;
+        this._evaluationBox = shadowRoot;
         this._observer.observe(this._evaluationBox, { attributes: true, childList: true, subtree: true });
-        return box;
+
+        return shadowRoot;
     }
 
     /** tries to initialise the code editor */
@@ -56,7 +57,12 @@ class Extension {
             return false;
         
         const nonvisibleBox = this.evaluationBox.querySelector('d2l-consistent-evaluation-assignments-evidence-non-viewable');
-        if (nonvisibleBox == null) 
+        if (nonvisibleBox == null || nonvisibleBox.shadowRoot == null) 
+            return false;
+
+        const nonViewableBox = nonvisibleBox.shadowRoot.querySelector('.d2l-consistent-eval-non-viewable');
+        console.log({nonvisibleBox, nonViewableBox});
+        if (nonViewableBox == null)
             return false;
 
         const url = nonvisibleBox.getAttribute('download-url');
@@ -69,7 +75,7 @@ class Extension {
         if (!AllowedLanguageFileTypes.includes(ext))
             return false;
 
-        await this.editor.load(url);
+        await this.editor.load(url, nonViewableBox);
         return true;
     }
 

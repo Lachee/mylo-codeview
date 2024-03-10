@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "dotenv": "^16.0.1",
-    "dotenv-webpack": "^8.0.1"
+    "dotenv-webpack": "^8.0.1",
+    "highlight.js": "^11.9.0"
   }
 }

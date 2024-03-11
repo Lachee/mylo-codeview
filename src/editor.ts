@@ -1,9 +1,9 @@
 import hljs from 'highlight.js/lib/core';
 
 import python from 'highlight.js/lib/languages/python';
-hljs.registerLanguage('python', python);
+hljs.registerLanguage('py', python);
 import csharp from 'highlight.js/lib/languages/csharp';
-hljs.registerLanguage('csharp', csharp);
+hljs.registerLanguage('cs', csharp);
 import java from 'highlight.js/lib/languages/java';
 hljs.registerLanguage('java', java);
 
@@ -43,7 +43,7 @@ export class Editor {
         // Create the code preview
         this.createCodeContainer(parent);
         if (this.container != null)
-            this.container.innerHTML = `<pre><code class="hljs">${hljs.highlightAuto(this.code).value + hljs.highlightAuto(this.code).value}</code></pre>`;
+            this.container.innerHTML = `<pre><code class="hljs">${hljs.highlightAuto(this.code).value}</code></pre>`;
     }
 
     createCodeContainer(parent: Element) {

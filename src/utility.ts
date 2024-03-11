@@ -30,6 +30,29 @@ export function findEvaluationEvidenceAssignment(): HTMLElement | null {
     return container;
 }
 
+/**
+ * Polls a callback until it returns a non-undefined result
+ * @param callback The function to poll a result for. If undefined, then the polling will continue.
+ * @param pollRate How often to check for a callback
+ * @returns 
+ */
+export function poll<T>(callback : () => T|undefined, pollRate : number = 150) : Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+        const interval = setInterval(() => {
+            try {
+                const result = callback();
+                if (result !== undefined) {
+                    clearInterval(interval);
+                    resolve(result);
+                }
+            } catch(e) {
+                clearInterval(interval);
+                reject(e);
+            }
+        }, pollRate);
+    });
+}
+
 /** raw JS version 
     let container = document.querySelector('d2l-consistent-evaluation');
     container = container.shadowRoot.querySelector('d2l-consistent-evaluation-page');

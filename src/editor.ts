@@ -17,24 +17,19 @@ export class Editor {
     constructor() {
     }
 
-    async reload(): Promise<void> {
-        const url = this.url;
-        this.url = '';
-        return this.load(url, this.container);
-    }
+    async create(url: string, parent: Element): Promise<void> {
+        if (this.container != null && this.container.isConnected && this.container.getAttribute('data-url') === url) {
+            //console.log('cannot create another code view because one already exists', this.container);
+            return;
+        }
 
-    async load(url: string, parent: Element | null): Promise<void> {
-        if (this.url === url) return;
         this.url = url;
 
-        console.log('downloading file...', url);
+        console.log('downloading and displaying', url);
         const body = await fetch(url).then(r => r.text());
-        console.log('finished downloading');
-
-        if (parent != null)
-            this.createCodeContainer(parent);
-
+        
         // If we have an editor, insert the highlighted stuff 
+        this.createCodeContainer(parent);
         if (this.container != null)
             this.container.innerHTML = `<pre><code class="hljs">${hljs.highlightAuto(body).value}</code></pre>`;
     }
@@ -54,6 +49,8 @@ export class Editor {
 
         // Add the editor box
         const container = document.createElement('div');
+        container.setAttribute('data-url', this.url);
+
         parent.appendChild(container);
         this.container = container;
     }

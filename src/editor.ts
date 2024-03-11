@@ -10,6 +10,7 @@ hljs.registerLanguage('java', java);
 export class Editor {
 
     url: string = '';
+    code : string = '';
     container: Element | null = null;
 
     _loadedStyle = false;
@@ -23,15 +24,19 @@ export class Editor {
             return;
         }
 
-        this.url = url;
-
-        console.log('downloading and displaying', url);
-        const body = await fetch(url).then(r => r.text());
+        // Download the code if we havn't done so already
+        if (this.url !== url) {
+            console.log('downloading and displaying', url);
+            this.url = url;
+            this.code = await fetch(url).then(r => r.text());
+        } else { 
+            console.log('displaying', url);
+        }
         
-        // If we have an editor, insert the highlighted stuff 
+        // Create the code preview
         this.createCodeContainer(parent);
         if (this.container != null)
-            this.container.innerHTML = `<pre><code class="hljs">${hljs.highlightAuto(body).value}</code></pre>`;
+            this.container.innerHTML = `<pre><code class="hljs">${hljs.highlightAuto(this.code).value}</code></pre>`;
     }
 
     createCodeContainer(parent: Element) {

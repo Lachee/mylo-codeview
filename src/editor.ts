@@ -7,6 +7,13 @@ hljs.registerLanguage('csharp', csharp);
 import java from 'highlight.js/lib/languages/java';
 hljs.registerLanguage('java', java);
 
+const ADDITIONAL_STYLE = `
+code { text-align: left; font-size: 11pt; line-height: 11pt; }
+.d2l-consistent-eval-non-viewable { justify-content: start !important; }
+.hlsj-container { overflow: auto; }
+`;
+
+
 export class Editor {
 
     url: string = '';
@@ -36,7 +43,7 @@ export class Editor {
         // Create the code preview
         this.createCodeContainer(parent);
         if (this.container != null)
-            this.container.innerHTML = `<pre><code class="hljs">${hljs.highlightAuto(this.code).value}</code></pre>`;
+            this.container.innerHTML = `<pre><code class="hljs">${hljs.highlightAuto(this.code).value + hljs.highlightAuto(this.code).value}</code></pre>`;
     }
 
     createCodeContainer(parent: Element) {
@@ -49,11 +56,12 @@ export class Editor {
         parent.appendChild(hljsStyleTag);
 
         const additionalStyleTag = document.createElement('style');
-        additionalStyleTag.innerText = "code { text-align: left; font-size: 11pt; line-height: 11pt; }";
+        additionalStyleTag.innerText = ADDITIONAL_STYLE;
         parent.appendChild(additionalStyleTag)
 
         // Add the editor box
         const container = document.createElement('div');
+        container.classList.add('hlsj-container');
         container.setAttribute('data-url', this.url);
 
         parent.appendChild(container);

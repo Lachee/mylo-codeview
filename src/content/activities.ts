@@ -1,13 +1,11 @@
-import { Editor } from "./editor";
-import { Messages } from "./messages";
-import { AllowedLanguageFileTypes, extname, findEvaluationEvidenceAssignment, poll } from "./utility";
+import { Editor } from "../lib/editor";
+import { AllowedLanguageFileTypes, extname, findEvaluationEvidenceAssignment, poll } from "../lib/utility";
 
-
-class Extension {
+class ActivityPage {
 
     private editor: Editor;
     private _observer: MutationObserver;
-    private _semaphore : Promise<void>|null = null;
+    private _semaphore: Promise<void> | null = null;
     private _evaluationBox: ShadowRoot | null = null;
     get evaluationBox(): ShadowRoot | null {
         return this._evaluationBox;
@@ -49,9 +47,9 @@ class Extension {
 
         this._evaluationBox = shadowRoot;
         this._observer.observe(this._evaluationBox, {
-            attributes: true, 
-            childList: true, 
-            subtree: true 
+            attributes: true,
+            childList: true,
+            subtree: true
         });
 
         return shadowRoot;
@@ -63,10 +61,10 @@ class Extension {
             //console.log('no evaulation box available');
             return false;
         }
-    
+
         // Get the shadow root
         const nonvisibleBox = this.evaluationBox.querySelector('d2l-consistent-evaluation-assignments-evidence-non-viewable');
-        const shadowRoot    = nonvisibleBox?.shadowRoot;
+        const shadowRoot = nonvisibleBox?.shadowRoot;
         if (nonvisibleBox == null || shadowRoot == null) {
             //console.log('failed to find the non-visible box');
             return false;
@@ -75,7 +73,7 @@ class Extension {
         // Get the visible box
         const nonViewableBox = await poll<Element>(() => {
             const nonViewableBox = shadowRoot.querySelector('.d2l-consistent-eval-non-viewable');
-            if (nonViewableBox != null) 
+            if (nonViewableBox != null)
                 return nonViewableBox;
         });
 
@@ -101,5 +99,5 @@ class Extension {
     }
 }
 
-const extension = new Extension();
-extension.init();
+const page = new ActivityPage();
+page.init();

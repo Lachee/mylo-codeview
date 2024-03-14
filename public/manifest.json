@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "MyLo Code View",
     "description": "Allows code to be inspected within MyLo",
-    "version": "1.0",
+    "version": "1.1",
     "icons": {
         "16": "images/icons.png",
         "48": "images/icons.png",
@@ -10,18 +10,13 @@
     },
     "permissions": [
         "activeTab",
-        "webNavigation",
         "tabs"
     ],
     "content_scripts": [
         {
             "run_at": "document_start",
-            "matches": [
-                "https://mylo.utas.edu.au/d2l/*"
-            ],
-            "js": [
-                "main.js"
-            ]
+            "matches": [ "https://mylo.utas.edu.au/d2l/le/activities/iterator/*" ],
+            "js": [ "activities.js" ]
         }
     ],
     "action": {

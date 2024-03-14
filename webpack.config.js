@@ -6,11 +6,12 @@ const Dotenv = require('dotenv-webpack');
 const path = require('path');
 const outputPath = 'dist';
 const entryPoints = {
-   main: [
-      path.resolve(__dirname, 'src', 'main.ts'),
-      path.resolve(__dirname, 'scss', 'main.scss')
+   activities: path.resolve(__dirname, 'src', 'content', 'activities.ts'),
+   background: path.resolve(__dirname, 'src', 'background.ts'),
+   'popup/popup': [
+      path.resolve(__dirname, 'src', 'popup', 'index.ts'),
+      path.resolve(__dirname, 'src', 'popup', 'index.scss')
    ],
-   background: path.resolve(__dirname, 'src', 'background.ts')
 };
 
 module.exports = {

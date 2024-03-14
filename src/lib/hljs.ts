@@ -6,13 +6,13 @@ import c from 'highlight.js/lib/languages/c';
 import csharp from 'highlight.js/lib/languages/csharp';
 import dart from 'highlight.js/lib/languages/dart';
 import java from 'highlight.js/lib/languages/java';
-import javaScript from 'highlight.js/lib/languages/javaScript';
+import javaScript from 'highlight.js/lib/languages/javascript';
 import kotlin from 'highlight.js/lib/languages/kotlin';
 import php from 'highlight.js/lib/languages/php';
 import python from 'highlight.js/lib/languages/python';
 import sql from 'highlight.js/lib/languages/sql';
 import swift from 'highlight.js/lib/languages/swift';
-import typeScript from 'highlight.js/lib/languages/typeScript';
+import typeScript from 'highlight.js/lib/languages/typescript';
 
 export type Language = {
     name: string,

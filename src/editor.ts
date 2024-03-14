@@ -59,6 +59,20 @@ export class Editor {
         additionalStyleTag.innerText = ADDITIONAL_STYLE;
         parent.appendChild(additionalStyleTag)
 
+        // Add the download link
+        const btn = document.createElement('div');
+        btn.innerHTML = `
+        <a aria-describedby="d2l-uid-186" class=" d2l-button-subtle-has-icon d2l-label-text " href="${this.url}" target="_BLANK">
+            <slot name="icon">
+                <d2l-icon class="d2l-button-subtle-icon" icon="tier1:download"></d2l-icon>
+            </slot>
+            <span class="d2l-button-subtle-content-wrapper">
+                <span class="d2l-button-subtle-content">Download</span>
+                <slot></slot>
+            </span>
+        </a>`;
+        parent.appendChild(btn);
+
         // Add the editor box
         const container = document.createElement('div');
         container.classList.add('hlsj-container');

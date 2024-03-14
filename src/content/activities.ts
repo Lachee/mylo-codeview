@@ -1,6 +1,6 @@
 import { Editor } from "../lib/editor";
-import { Languages, getLanguageFromExtension } from "../lib/hljs";
-import { extname, findEvaluationEvidenceAssignment, poll } from "../lib/utility";
+import { getLanguageFromExtension } from "../lib/hljs";
+import { extname, findEvaluationEvidenceAssignment, poll as find } from "../lib/utility";
 
 class ActivityPage {
 
@@ -40,7 +40,7 @@ class ActivityPage {
     /** Looks for the first available evaulation box and attaches an observer */
     async observeEvaluationBox(): Promise<ShadowRoot> {
         this.disconnectEvaluationBox();
-        const shadowRoot = await poll<ShadowRoot>(() => {
+        const shadowRoot = await find<ShadowRoot>(() => {
             const box = findEvaluationEvidenceAssignment();
             if (box !== null && box.shadowRoot !== null)
                 return box.shadowRoot;
@@ -71,13 +71,6 @@ class ActivityPage {
             return false;
         }
 
-        // Get the visible box
-        const nonViewableBox = await poll<Element>(() => {
-            const nonViewableBox = shadowRoot.querySelector('.d2l-consistent-eval-non-viewable');
-            if (nonViewableBox != null)
-                return nonViewableBox;
-        });
-
         // Get the url
         const url = nonvisibleBox.getAttribute('download-url');
         const title = nonvisibleBox.getAttribute('title');
@@ -85,6 +78,17 @@ class ActivityPage {
             //console.log('non-visible box does not have a valid url or title', { url, title });
             return false;
         }
+
+        await this.createDownloadButton(shadowRoot, url, title);
+        await this.createCodeViewer(shadowRoot, url, title);
+
+        return true;
+    }
+
+    /** creates the code view for the given url */
+    async createCodeViewer(frag: DocumentFragment, url: string, title: string) {
+        // Get the visible box
+        const parent = await find<Element>(() => frag.querySelector('.d2l-consistent-eval-non-viewable') ?? undefined);
 
         // Get the extension
         const ext = extname(title);
@@ -95,8 +99,31 @@ class ActivityPage {
         }
 
         // Create the editor
-        await this.editor.create(url, lang, nonViewableBox);
-        return true;
+        await this.editor.create(url, lang, parent);
+    }
+
+    /** creates the download button for the given url */
+    async createDownloadButton(frag: DocumentFragment, url: string, title: string) {
+        // Get the visible top bar
+        const topbarRoot = await find<ShadowRoot>(() => frag.querySelector('d2l-consistent-evaluation-assignments-evidence-top-bar')?.shadowRoot ?? undefined);
+        console.log('topbar', topbarRoot)
+        const parent = await find<Element>(() => topbarRoot.querySelector('.d2l-consistent-evaluation-assignments-evidence-top-bar') ?? undefined);
+        console.log('topbar elm', parent);
+        
+        // Check for the button
+        if (parent.querySelector('[name=download]') != null)
+            return;
+
+        // Create the button
+        const d2lButton = document.createElement('d2l-button-subtle');
+        d2lButton.setAttribute('name', 'download');
+        d2lButton.setAttribute('icon', 'tier1:download');
+        d2lButton.setAttribute('text', 'Download');
+        d2lButton.setAttribute('type', 'button');
+        d2lButton.setAttribute('title', title);
+        d2lButton.setAttribute('download-url', url);
+        d2lButton.addEventListener('click', () => window.open(url, '_BLANK'));
+        parent.appendChild(d2lButton);        
     }
 }
 

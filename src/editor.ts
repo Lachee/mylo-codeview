@@ -62,7 +62,7 @@ export class Editor {
         // Add the download link
         const btn = document.createElement('div');
         btn.innerHTML = `
-        <a aria-describedby="d2l-uid-186" class=" d2l-button-subtle-has-icon d2l-label-text " href="${this.url}" target="_BLANK">
+        <a class="d2l-button-subtle-has-icon d2l-label-text " href="${this.url}" target="_BLANK">
             <slot name="icon">
                 <d2l-icon class="d2l-button-subtle-icon" icon="tier1:download"></d2l-icon>
             </slot>

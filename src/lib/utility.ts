@@ -1,10 +1,3 @@
-export const LanguageFileTypes = {
-    Python: 'py',
-    CSharp: 'cs',
-    Java: 'java',
-    C: 'c',
-} as const;
-export const AllowedLanguageFileTypes = Object.values(LanguageFileTypes);
 
 /**
  * Gets the extension of the given file
@@ -36,7 +29,7 @@ export function findEvaluationEvidenceAssignment(): HTMLElement | null {
  * @param pollRate How often to check for a callback
  * @returns 
  */
-export function poll<T>(callback : () => T|undefined, pollRate : number = 150) : Promise<T> {
+export function poll<T>(callback: () => T | undefined, pollRate: number = 150): Promise<T> {
     return new Promise<T>((resolve, reject) => {
         const interval = setInterval(() => {
             try {
@@ -45,7 +38,7 @@ export function poll<T>(callback : () => T|undefined, pollRate : number = 150) :
                     clearInterval(interval);
                     resolve(result);
                 }
-            } catch(e) {
+            } catch (e) {
                 clearInterval(interval);
                 reject(e);
             }

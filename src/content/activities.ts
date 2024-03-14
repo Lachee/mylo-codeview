@@ -1,5 +1,6 @@
 import { Editor } from "../lib/editor";
-import { AllowedLanguageFileTypes, extname, findEvaluationEvidenceAssignment, poll } from "../lib/utility";
+import { Languages, getLanguageFromExtension } from "../lib/hljs";
+import { extname, findEvaluationEvidenceAssignment, poll } from "../lib/utility";
 
 class ActivityPage {
 
@@ -87,14 +88,14 @@ class ActivityPage {
 
         // Get the extension
         const ext = extname(title);
-        /** @ts-ignore this is a weird thing because AllowedLanguageFileTypes is based of a const */
-        if (!AllowedLanguageFileTypes.includes(ext)) {
+        const lang = getLanguageFromExtension(ext);
+        if (lang === undefined) {
             console.log('Cannot display code-preview because the file extension is not allowed', ext);
             return false;
         }
 
         // Create the editor
-        await this.editor.create(url, nonViewableBox);
+        await this.editor.create(url, lang, nonViewableBox);
         return true;
     }
 }

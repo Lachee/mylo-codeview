@@ -1,18 +1,15 @@
-import hljs from 'highlight.js/lib/core';
+import { type Language, hljs, registerLanguage } from './hljs';
 
-import python from 'highlight.js/lib/languages/python';
-hljs.registerLanguage('py', python);
-import csharp from 'highlight.js/lib/languages/csharp';
-hljs.registerLanguage('cs', csharp);
-import java from 'highlight.js/lib/languages/java';
-hljs.registerLanguage('java', java);
+//const HLJS_THEME = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css';
+const HLJS_THEME_DARK = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css';
+const HLJS_THEME_LIGHT = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs.min.css';
+const HLJS_THEME = HLJS_THEME_LIGHT;
 
 const ADDITIONAL_STYLE = `
 code { text-align: left; font-size: 11pt; line-height: 11pt; }
 .d2l-consistent-eval-non-viewable { justify-content: start !important; }
 .hlsj-container { overflow: auto; }
 `;
-
 
 export class Editor {
 
@@ -25,7 +22,7 @@ export class Editor {
     constructor() {
     }
 
-    async create(url: string, parent: Element): Promise<void> {
+    async create(url: string, lang: Language|undefined, parent: Element): Promise<void> {
         if (this.container != null && this.container.isConnected && this.container.getAttribute('data-url') === url) {
             //console.log('cannot create another code view because one already exists', this.container);
             return;
@@ -42,8 +39,17 @@ export class Editor {
         
         // Create the code preview
         this.createCodeContainer(parent);
-        if (this.container != null)
-            this.container.innerHTML = `<pre><code class="hljs">${hljs.highlightAuto(this.code).value}</code></pre>`;
+        if (this.container != null) {
+            let code = this.code;
+            if (lang !== undefined) {
+                registerLanguage(lang);
+                code = hljs.highlight(code, { language: lang.name }).value;
+            } else {
+                code = hljs.highlightAuto(code).value;
+            }
+
+            this.container.innerHTML = `<pre><code class="hljs">${code}</code></pre>`;
+        }
     }
 
     createCodeContainer(parent: Element) {
@@ -52,7 +58,7 @@ export class Editor {
         // Add HLJS
         const hljsStyleTag = document.createElement('link');
         hljsStyleTag.setAttribute('rel', 'stylesheet');
-        hljsStyleTag.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css');
+        hljsStyleTag.setAttribute('href', HLJS_THEME);
         parent.appendChild(hljsStyleTag);
 
         const additionalStyleTag = document.createElement('style');

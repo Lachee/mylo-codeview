@@ -38,13 +38,15 @@ If there is demand for it, please let me know as I understand it can be a pain i
 #### Manually
 1. Go to [chrome://extensions](chrome://extensions)
 2. In the top right, make sure Developer Mode is enabled
-3. IN the top left, Load unpacked, then the built `dist/` folder or the unpacked .zip file
+3. If using your own [build](#building): On the top left press the `Load Unpacked` and select the generated `dist/`
+4. If using an [artifact](https://github.com/Lachee/mylo-codeview/actions/workflows/package.yml) or [release](https://github.com/Lachee/mylo-codeview/releases): Drag the .zip file onto this page.
 
 ### Microsoft Edge
 Edge will nag you about developer extensions, i do applogise.
 1. Go to [edge://extensions](edge://extensions)
 2. In the left navigation panel, enable developer mode
-3. Load unpacked, then the built `dist/` folder or the unpacked .zip file
+3. If using your own [build](#building): On the top right press the `Load Unpacked` and select the generated `dist/`
+4. If using an [artifact](https://github.com/Lachee/mylo-codeview/actions/workflows/package.yml) or [release](https://github.com/Lachee/mylo-codeview/releases): Drag the .zip file onto this page.
 
 # Suggestions
 If you like to make a suggestion, please feel free to [open an issue](https://github.com/Lachee/mylo-codeview/issues/new)!

@@ -8,13 +8,13 @@ import csharp from 'highlight.js/lib/languages/csharp';
 import dart from 'highlight.js/lib/languages/dart';
 import java from 'highlight.js/lib/languages/java';
 import javaScript from 'highlight.js/lib/languages/javascript';
+import json from 'highlight.js/lib/languages/json';
 import kotlin from 'highlight.js/lib/languages/kotlin';
 import php from 'highlight.js/lib/languages/php';
 import python from 'highlight.js/lib/languages/python';
 import sql from 'highlight.js/lib/languages/sql';
 import swift from 'highlight.js/lib/languages/swift';
 import typeScript from 'highlight.js/lib/languages/typescript';
-import json from 'highlight.js/lib/languages/json';
 
 export type Language = {
     name: string,
@@ -26,22 +26,22 @@ export type Language = {
 
 // Declare the langauges
 export const Languages: Language[] = [
-    { name: "C", ext: "c", module: c, alias: [ '.h' ] },
-    { name: "C++", ext: "cpp", module: cpp, alias: [ '.hpp' ] },
-    { name: "C#", ext: "cs", module: csharp, alias: [ 'csharp' ] },
+    { name: "C", ext: "c", module: c, alias: ['.h'] },
+    { name: "C++", ext: "cpp", module: cpp, alias: ['.hpp'] },
+    { name: "C#", ext: "cs", module: csharp, alias: ['csharp'] },
     { name: "Dart", ext: "dart", module: dart },
     { name: "Java", ext: "java", module: java },
     { name: "JavaScript", ext: "js", module: javaScript },
+    { name: "JSON", ext: "json", module: json },
     { name: "Kotlin", ext: "kt", module: kotlin },
     { name: "PHP", ext: "php", module: php },
     { name: "Python", ext: "py", module: python },
     { name: "SQL", ext: "sql", module: sql },
     { name: "Swift", ext: "swift", module: swift },
     { name: "TypeScript", ext: "ts", module: typeScript },
-    { name: "JSON", ext: "json", module: json },
 ];
 
-const _languageExtensionMap : Record<string, Language> = {};
+const _languageExtensionMap: Record<string, Language> = {};
 
 export function getLanguageFromExtension(ext: string): (Language | undefined) {
     if (ext.length == 0)
@@ -54,7 +54,7 @@ export function getLanguageFromExtension(ext: string): (Language | undefined) {
     if (_languageExtensionMap[ext] !== undefined)
         return _languageExtensionMap[ext];
 
-    for(const language of Languages) {
+    for (const language of Languages) {
         if (language.ext === ext)
             return _languageExtensionMap[ext] = language;
     }
@@ -63,7 +63,7 @@ export function getLanguageFromExtension(ext: string): (Language | undefined) {
 }
 
 export function registerAllLanguages() {
-    for(const lang of Languages) 
+    for (const lang of Languages)
         registerLanguage(lang);
 }
 
@@ -76,7 +76,7 @@ export function registerLanguage(lang: Language) {
 
     lang.registered = true;
     hljs.registerLanguage(languageName, lang.module);
-    
+
     const aliases = lang.alias ?? [];
     aliases.push(lang.name);
     aliases.push("." + lang.ext);

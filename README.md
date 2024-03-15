@@ -45,3 +45,11 @@ Edge will nag you about developer extensions, i do applogise.
 1. Go to [edge://extensions](edge://extensions)
 2. In the left navigation panel, enable developer mode
 3. Load unpacked, then the built `dist/` folder or the unpacked .zip file
+
+# Suggestions
+If you like to make a suggestion, please feel free to [open an issue](https://github.com/Lachee/mylo-codeview/issues/new)!
+I am all open for improving this project and making it better for everyone. 
+Please be patient however, this project is entirely done for my personal use. If you must have a feature, consider implementing it yourself and doing a [pull request](https://github.com/Lachee/mylo-codeview/compare) 😊
+
+# Contribution
+All code contributed will be licensed under MIT and will be as-is. 

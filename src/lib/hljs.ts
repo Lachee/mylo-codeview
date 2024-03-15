@@ -13,6 +13,7 @@ import python from 'highlight.js/lib/languages/python';
 import sql from 'highlight.js/lib/languages/sql';
 import swift from 'highlight.js/lib/languages/swift';
 import typeScript from 'highlight.js/lib/languages/typescript';
+import json from 'highlight.js/lib/languages/json';
 
 export type Language = {
     name: string,
@@ -35,6 +36,7 @@ export const Languages: Language[] = [
     { name: "SQL", ext: "sql", module: sql },
     { name: "Swift", ext: "swift", module: swift },
     { name: "TypeScript", ext: "ts", module: typeScript },
+    { name: "JSON", ext: "json", module: json },
 ];
 
 const _languageExtensionMap : Record<string, Language> = {};

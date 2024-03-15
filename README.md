@@ -28,7 +28,7 @@ To build the extension yourself. First clone and navigate to the repository, the
 - **NPM** `npm i && npm run build`
   
 # Installation
-> First build or [download the artifact](https://github.com/Lachee/unity-utilities/actions/workflows/release.yml) of the extension. 
+> First build or [download the artifact](https://github.com/Lachee/chrome-mylo-codeview/actions/workflows/package.yml) of the extension. 
 
 ### Google Chrome
 #### Chrome Store

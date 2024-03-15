@@ -3,6 +3,7 @@ import hljsAPI from 'highlight.js/lib/core';
 export const hljs = hljsAPI;
 
 import c from 'highlight.js/lib/languages/c';
+import cpp from 'highlight.js/lib/languages/cpp';
 import csharp from 'highlight.js/lib/languages/csharp';
 import dart from 'highlight.js/lib/languages/dart';
 import java from 'highlight.js/lib/languages/java';
@@ -26,6 +27,7 @@ export type Language = {
 // Declare the langauges
 export const Languages: Language[] = [
     { name: "C", ext: "c", module: c, alias: [ '.h' ] },
+    { name: "C++", ext: "cpp", module: cpp, alias: [ '.hpp' ] },
     { name: "C#", ext: "cs", module: csharp, alias: [ 'csharp' ] },
     { name: "Dart", ext: "dart", module: dart },
     { name: "Java", ext: "java", module: java },

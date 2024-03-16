@@ -34,22 +34,26 @@ jobs:
   # Tag the build
   tag:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
     steps:
     - uses: actions/checkout@v4
-    - uses: Klemensas/action-autotag@stable
-      id: auto-tag
+    - uses: Klemensas/action-autotag@1.1.4
+      id: tagger
       with:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        strategy: regex
+        root: public/manifest.json
+        regex_pattern: "\"version\":\s*\"([0-9\.]{3,})\""
         tag_prefix: "v"
     outputs:
-      tag: ${{ steps.auto-tag.outputs.tagname }}
+      tag: ${{ steps.tagger.outputs.tagname }}
 
   # Update the release
   release:
     runs-on: ubuntu-latest
-#    needs: [ build, tag ]
+    needs: [ build, tag ]
     needs: [ build ]
-#    if: ${{ startsWith(needs.tag.outputs.tag, 'v') }}
+    if: ${{ startsWith(needs.tag.outputs.tag, 'v') }}
     steps:
       - uses: actions/checkout@v4
   

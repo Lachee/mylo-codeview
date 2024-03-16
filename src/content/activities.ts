@@ -80,13 +80,13 @@ class ActivityPage {
         }
 
         await this.createDownloadButton(shadowRoot, url, title);
-        await this.createCodeViewer(shadowRoot, url, title);
+        await this.createCodeEditor(shadowRoot, url, title);
 
         return true;
     }
 
-    /** creates the code view for the given url */
-    async createCodeViewer(frag: DocumentFragment, url: string, title: string) {
+    /** creates the code editor for the given url */
+    async createCodeEditor(frag: DocumentFragment, url: string, title: string) {
         // Get the visible box
         const parent = await find<Element>(() => frag.querySelector('.d2l-consistent-eval-non-viewable') ?? undefined);
 
@@ -98,8 +98,12 @@ class ActivityPage {
             return false;
         }
 
+        // Set the default editor
+        if (lang.editor == null)
+            lang.editor = this.editor;
+        
         // Create the editor
-        await this.editor.create(url, lang, parent);
+        await lang.editor.create(url, lang, parent);
     }
 
     /** creates the download button for the given url */

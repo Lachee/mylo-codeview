@@ -1,4 +1,4 @@
-import { type Language, hljs, registerLanguage } from './hljs';
+import { type Language, hljs, registerLanguage, CodeEditor } from './hljs';
 
 //const HLJS_THEME = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css';
 const HLJS_THEME_DARK = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css';
@@ -11,10 +11,10 @@ div.d2l-consistent-eval-non-viewable { justify-content: start; height: calc(100%
 .hlsj-container { overflow: auto; }
 `;
 
-export class Editor {
+export class Editor implements CodeEditor {
 
     url: string = '';
-    code : string = '';
+    code: string = '';
     container: Element | null = null;
 
     _loadedStyle = false;
@@ -22,7 +22,7 @@ export class Editor {
     constructor() {
     }
 
-    async create(url: string, lang: Language|undefined, parent: Element): Promise<void> {
+    async create(url: string, lang: Language | undefined, parent: Element): Promise<void> {
         if (this.container != null && this.container.isConnected && this.container.getAttribute('data-url') === url) {
             //console.log('cannot create another code view because one already exists', this.container);
             return;
@@ -33,10 +33,10 @@ export class Editor {
             console.log('downloading and displaying', url);
             this.url = url;
             this.code = await fetch(url).then(r => r.text());
-        } else { 
+        } else {
             console.log('displaying', url);
         }
-        
+
         // Create the code preview
         this.createCodeContainer(parent);
         if (this.container != null) {
@@ -72,5 +72,30 @@ export class Editor {
 
         parent.appendChild(container);
         this.container = container;
+    }
+}
+
+export class PyEditor extends Editor {
+    async create(url: string, lang: Language | undefined, parent: Element): Promise<void> {
+        await super.create(url, lang, parent);
+        if (!this.container) return;
+
+        console.log('appending pyscript');
+        this.container.innerHTML += `<script type="py" src="${url}" config="./pyscript.toml" terminal worker></script>`;
+    }
+
+    createCodeContainer(parent: Element): void {
+        super.createCodeContainer(parent);
+
+        // Add PyScript
+        const pyscriptStyleTag = document.createElement('link');
+        pyscriptStyleTag.setAttribute('rel', 'stylesheet');
+        pyscriptStyleTag.setAttribute('href', 'https://pyscript.net/releases/2024.3.1/core.css');
+        parent.appendChild(pyscriptStyleTag);
+
+        const pyscriptScriptTag = document.createElement('script');
+        pyscriptScriptTag.setAttribute('type', 'module');
+        pyscriptScriptTag.setAttribute('src', 'https://pyscript.net/releases/2024.3.1/core.js');
+        parent.appendChild(pyscriptStyleTag);
     }
 }

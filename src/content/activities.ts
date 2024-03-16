@@ -1,6 +1,12 @@
-import { Editor } from "../lib/editor";
+import { Editor, PyEditor } from "../lib/editor";
 import { getLanguageFromExtension } from "../lib/hljs";
 import { extname, findEvaluationEvidenceAssignment, poll as find } from "../lib/utility";
+
+class Interop {
+    test() {
+        console.log('TEST INTEROP');
+    }
+}
 
 class ActivityPage {
 
@@ -26,14 +32,34 @@ class ActivityPage {
         });
     }
 
-    init() {
-        this.observeEvaluationBox();
+    async init() : Promise<void> {
+        await this.install();
+        await this.observeEvaluationBox();
     }
 
     /** disconenects the evaulation box and hte observer */
     disconnectEvaluationBox() {
         this._evaluationBox = null;
         this._observer.disconnect();
+    }
+
+    async install() : Promise<void> {
+        await Promise.all([
+            find<Element>(() => document.head ?? undefined),
+            find<Element>(() => document.body ?? undefined),
+        ]);
+
+        // Install PyScript
+        const pyscriptScriptTag = document.createElement('script');
+        pyscriptScriptTag.setAttribute('type', 'module');
+        pyscriptScriptTag.setAttribute('name', 'py');
+        pyscriptScriptTag.setAttribute('src', 'https://pyscript.net/releases/2024.1.1/core.js');
+        document.head.appendChild(pyscriptScriptTag);
+        
+        const pyscriptStyleTag = document.createElement('link');
+        pyscriptStyleTag.setAttribute('rel', 'stylesheet');
+        pyscriptStyleTag.setAttribute('href', 'https://pyscript.net/releases/2024.1.1/core.css');
+        document.head.appendChild(pyscriptStyleTag);
     }
 
     /** Looks for the first available evaulation box and attaches an observer */
@@ -98,9 +124,15 @@ class ActivityPage {
         }
 
         // Set the default editor
-        if (lang.editor == null)
-            lang.editor = this.editor;
-        
+        if (lang.editor == null) {
+            console.log('language has no editor: ', lang.name, lang);
+            if (lang.name == "Python") {
+                lang.editor = new PyEditor();
+            } else {
+                lang.editor = this.editor;
+            }
+        }
+
         // Create the editor
         await lang.editor.create(url, lang, parent);
     }
@@ -110,7 +142,7 @@ class ActivityPage {
         // Get the visible top bar
         const topbarRoot = await find<ShadowRoot>(() => frag.querySelector('d2l-consistent-evaluation-assignments-evidence-top-bar')?.shadowRoot ?? undefined);
         const parent = await find<Element>(() => topbarRoot.querySelector('.d2l-consistent-evaluation-assignments-evidence-top-bar') ?? undefined);
-        
+
         // Check for the button
         if (parent.querySelector('[name=download]') != null)
             return;
@@ -124,7 +156,7 @@ class ActivityPage {
         d2lButton.setAttribute('title', title);
         d2lButton.setAttribute('download-url', url);
         d2lButton.addEventListener('click', () => window.open(url, '_BLANK'));
-        parent.appendChild(d2lButton);        
+        parent.appendChild(d2lButton);
     }
 }
 

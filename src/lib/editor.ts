@@ -23,38 +23,44 @@ export class Editor implements CodeEditor {
     }
 
     async create(url: string, lang: Language | undefined, parent: Element): Promise<void> {
-        if (this.container != null && this.container.isConnected && this.container.getAttribute('data-url') === url) {
-            //console.log('cannot create another code view because one already exists', this.container);
-            return;
+        // Are we already displaying this nonsense?
+        if (this.isDisplayingURL(url)) return;
+
+        // Create the preview
+        parent.innerHTML = '';
+        this.createCodeContainer(parent);
+        if (this.container == null) return;
+
+        // Download and display code
+        let code = await this.download(url);
+        if (lang !== undefined) {
+            registerLanguage(lang);
+            code = hljs.highlight(code, { language: lang.name }).value;
+        } else {
+            code = hljs.highlightAuto(code).value;
         }
 
+        this.container.innerHTML = `<pre><code class="hljs">${code}</code></pre>`;
+    }
+
+    isDisplayingURL(url: string): boolean {
+        return this.container != null && this.container.isConnected && this.container.getAttribute('data-url') === url
+    }
+
+    /** downloads the code */
+    async download(url: string): Promise<string> {
         // Download the code if we havn't done so already
         if (this.url !== url) {
-            console.log('downloading and displaying', url);
+            console.log('- downloading code at', url);
             this.url = url;
             this.code = await fetch(url).then(r => r.text());
         } else {
-            console.log('displaying', url);
+            console.log('- using cached code for', url);
         }
-
-        // Create the code preview
-        this.createCodeContainer(parent);
-        if (this.container != null) {
-            let code = this.code;
-            if (lang !== undefined) {
-                registerLanguage(lang);
-                code = hljs.highlight(code, { language: lang.name }).value;
-            } else {
-                code = hljs.highlightAuto(code).value;
-            }
-
-            this.container.innerHTML = `<pre><code class="hljs">${code}</code></pre>`;
-        }
+        return this.code;
     }
 
     createCodeContainer(parent: Element) {
-        parent.innerHTML = '';
-
         // Add HLJS
         const hljsStyleTag = document.createElement('link');
         hljsStyleTag.setAttribute('rel', 'stylesheet');
@@ -76,26 +82,78 @@ export class Editor implements CodeEditor {
 }
 
 export class PyEditor extends Editor {
-    async create(url: string, lang: Language | undefined, parent: Element): Promise<void> {
-        await super.create(url, lang, parent);
-        if (!this.container) return;
 
-        console.log('appending pyscript');
-        this.container.innerHTML += `<script type="py" src="${url}" config="./pyscript.toml" terminal worker></script>`;
+    popup : HTMLDialogElement|null = null;
+
+    constructor() {
+        super();
+    }
+
+    async create(url: string, lang: Language | undefined, parent: Element): Promise<void> {
+        // Are we already displaying this nonsense?
+        if (this.isDisplayingURL(url)) return;
+
+        parent.innerHTML = '';
+        this.createCodeContainer(parent);
+        if (this.container == null) return;
+
+        // Download and display code
+        let formattedCode = await this.download(url);
+        if (lang !== undefined) {
+            registerLanguage(lang);
+            formattedCode = hljs.highlight(this.code, { language: lang.name }).value;
+        } else {
+            formattedCode = hljs.highlightAuto(this.code).value;
+        }
+
+        /** @ts-ignore */
+        window.pylog = (...args) => {
+            console.log('[PY]', ...args);
+        }
+
+
+        const logger = `<pre id="test" class="pyscript-container"></pre>`;
+        const viewer = `<pre><code class="hljs">${formattedCode}</code></pre>`;
+        //const runner = `<py-script type="py">print("hello world")</py-script>`;
+        //const viewer = '';
+        this.container.innerHTML = viewer;
+
     }
 
     createCodeContainer(parent: Element): void {
+        console.log('create code container with pyscript');
+
+        // Setup the popup
+        if (!this.popup) this.popup = document.querySelector('.pyscript-popup');
+        if (!this.popup) {
+            this.popup = document.createElement('dialog');
+            document.body.appendChild(this.popup);
+        }
+        this.popup.innerHTML = `<button autofocus>Close</button>`;
+        this.popup.querySelector('button')?.addEventListener('click', () => {
+            if (!this.popup) return;
+            this.popup.close(); 
+        });
+
+        // The button to open the popup
+        const btn = document.createElement('button');
+        btn.innerText = "RUN";
+        btn.addEventListener('click', () => {
+            if (!this.popup) return;
+            this.popup.showModal();
+
+            if (!this.popup.querySelector('script[type=py]')) {
+                const preamble = `from pyscript import window\ninput = window.prompt\n`;
+                
+                const runner = document.createElement('script');
+                runner.setAttribute('type', 'py');
+                runner.setAttribute('terminal', '');
+                runner.innerHTML = preamble + this.code;
+                this.popup.appendChild(runner);
+            }
+        });
+        parent.appendChild(btn);
+
         super.createCodeContainer(parent);
-
-        // Add PyScript
-        const pyscriptStyleTag = document.createElement('link');
-        pyscriptStyleTag.setAttribute('rel', 'stylesheet');
-        pyscriptStyleTag.setAttribute('href', 'https://pyscript.net/releases/2024.3.1/core.css');
-        parent.appendChild(pyscriptStyleTag);
-
-        const pyscriptScriptTag = document.createElement('script');
-        pyscriptScriptTag.setAttribute('type', 'module');
-        pyscriptScriptTag.setAttribute('src', 'https://pyscript.net/releases/2024.3.1/core.js');
-        parent.appendChild(pyscriptStyleTag);
     }
 }

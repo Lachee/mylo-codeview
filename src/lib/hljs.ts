@@ -1,6 +1,4 @@
-import { PyEditor } from './editor';
-
-import { LanguageFn } from 'highlight.js';
+import { type LanguageFn } from 'highlight.js';
 import hljsAPI from 'highlight.js/lib/core';
 export const hljs = hljsAPI;
 
@@ -20,21 +18,9 @@ import swift from 'highlight.js/lib/languages/swift';
 import typeScript from 'highlight.js/lib/languages/typescript';
 import xml from 'highlight.js/lib/languages/xml';
 
-export interface CodeEditor {
-    create(url: string, lang: Language|undefined, parent: Element): Promise<void>;
-}
-
-export type Language = {
-    name: string,
-    ext: string,
-    module: LanguageFn,
-    alias?: string[],
-    registered?: boolean,
-    editor?: CodeEditor,
-}
 
 // Declare the langauges
-export const Languages: Language[] = [
+const languages = [
     { name: "C", ext: "c", module: c, alias: ['.h'] },
     { name: "C++", ext: "cpp", module: cpp, alias: ['.hpp'] },
     { name: "C#", ext: "cs", module: csharp, alias: ['csharp'] },
@@ -45,15 +31,36 @@ export const Languages: Language[] = [
     { name: "JSON", ext: "json", module: json },
     { name: "Kotlin", ext: "kt", module: kotlin },
     { name: "PHP", ext: "php", module: php },
-    { name: "Python", ext: "py", module: python, editor: new PyEditor() },
+    { name: "Python", ext: "py", module: python },
     { name: "SQL", ext: "sql", module: sql },
     { name: "Swift", ext: "swift", module: swift },
     { name: "TypeScript", ext: "ts", module: typeScript },
     { name: "XML", ext: "xml", module: xml, alias: ['html', '.html', 'uxml', '.uxml', 'xaml', '.xaml'] }
-];
+] as const;
+
+/** Name of a valid language */
+export type LanguageName = typeof languages[number]['name'];
+/** Programming language data */
+export type Language = {
+    name:   LanguageName,
+    ext:    Readonly<string>,
+    module: Readonly<LanguageFn>,
+    alias?: Readonly<string[]>,
+
+    registered?: boolean,
+    editor?: CodeEditor,
+}
+
+export interface CodeEditor {
+    create(url: string, lang: Language|undefined, parent: Element): Promise<void>;
+}
+
+/** @ts-ignore we are ignoring the error this throws because it is convient */
+const _langauges : Language[] = languages;
+/** List of all available languages */
+export const Languages = _langauges;
 
 const _languageExtensionMap: Record<string, Language> = {};
-
 export function getLanguageFromExtension(ext: string): (Language | undefined) {
     if (ext.length == 0)
         return undefined;
@@ -86,9 +93,9 @@ export function registerLanguage(lang: Language) {
     const languageName = lang.name.toLowerCase();
 
     lang.registered = true;
-    hljs.registerLanguage(languageName, lang.module);
+    hljs.registerLanguage(languageName, lang.module as LanguageFn);
 
-    const aliases = lang.alias ?? [];
+    const aliases = lang.alias?.map(v => v) ?? [];
     aliases.push(lang.name);
     aliases.push("." + lang.ext);
     hljs.registerAliases(aliases, { languageName });

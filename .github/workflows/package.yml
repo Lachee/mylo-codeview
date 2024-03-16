@@ -7,6 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
+  # Build the package
   build:
     runs-on: ubuntu-latest
 
@@ -25,7 +26,43 @@ jobs:
 
     # Upload artifact
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v4
       with:
         name: "MyLo CodeView"
         path: dist/
+
+  # Tag the build
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: Klemensas/action-autotag@stable
+      id: auto-tag
+      with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        tag_prefix: "v"
+    outputs:
+      tag: ${{ steps.auto-tag.outputs.tagname }}
+
+  # Update the release
+  release:
+    runs-on: ubuntu-latest
+#    needs: [ build, tag ]
+    needs: [ build ]
+#    if: ${{ startsWith(needs.tag.outputs.tag, 'v') }}
+    steps:
+      - uses: actions/checkout@v3
+  
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - run: ls -R artifacts
+
+#      - uses: "marvinpinto/action-automatic-releases@latest"
+#        with:
+#          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+#          automatic_release_tag: ${{ needs.tag.outputs.tag }}
+#          prerelease: true
+#          title: Release ${{ needs.tag.outputs.tag }}
+#          files: artifacts/**/*.unitypackage

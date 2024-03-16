@@ -27,7 +27,6 @@ class ActivityPage {
     }
 
     init() {
-        console.log('initializing document');
         this.observeEvaluationBox();
     }
 
@@ -106,9 +105,7 @@ class ActivityPage {
     async createDownloadButton(frag: DocumentFragment, url: string, title: string) {
         // Get the visible top bar
         const topbarRoot = await find<ShadowRoot>(() => frag.querySelector('d2l-consistent-evaluation-assignments-evidence-top-bar')?.shadowRoot ?? undefined);
-        console.log('topbar', topbarRoot)
         const parent = await find<Element>(() => topbarRoot.querySelector('.d2l-consistent-evaluation-assignments-evidence-top-bar') ?? undefined);
-        console.log('topbar elm', parent);
         
         // Check for the button
         if (parent.querySelector('[name=download]') != null)

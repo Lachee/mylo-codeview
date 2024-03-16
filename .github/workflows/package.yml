@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: ButlerLogic/action-autotag@1.1.3 
+    - uses: ButlerLogic/action-autotag@1.1.2 
       id: tagger
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

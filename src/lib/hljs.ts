@@ -5,6 +5,7 @@ export const hljs = hljsAPI;
 import c from 'highlight.js/lib/languages/c';
 import cpp from 'highlight.js/lib/languages/cpp';
 import csharp from 'highlight.js/lib/languages/csharp';
+import css from 'highlight.js/lib/languages/css';
 import dart from 'highlight.js/lib/languages/dart';
 import java from 'highlight.js/lib/languages/java';
 import javaScript from 'highlight.js/lib/languages/javascript';
@@ -15,6 +16,7 @@ import python from 'highlight.js/lib/languages/python';
 import sql from 'highlight.js/lib/languages/sql';
 import swift from 'highlight.js/lib/languages/swift';
 import typeScript from 'highlight.js/lib/languages/typescript';
+import xml from 'highlight.js/lib/languages/xml';
 
 export type Language = {
     name: string,
@@ -29,6 +31,7 @@ export const Languages: Language[] = [
     { name: "C", ext: "c", module: c, alias: ['.h'] },
     { name: "C++", ext: "cpp", module: cpp, alias: ['.hpp'] },
     { name: "C#", ext: "cs", module: csharp, alias: ['csharp'] },
+    { name: "CSS", ext: "css", module: css },
     { name: "Dart", ext: "dart", module: dart },
     { name: "Java", ext: "java", module: java },
     { name: "JavaScript", ext: "js", module: javaScript },
@@ -39,6 +42,7 @@ export const Languages: Language[] = [
     { name: "SQL", ext: "sql", module: sql },
     { name: "Swift", ext: "swift", module: swift },
     { name: "TypeScript", ext: "ts", module: typeScript },
+    { name: "XML", ext: "xml", module: xml, alias: ['html', '.html', 'uxml', '.uxml', 'xaml', '.xaml'] }
 ];
 
 const _languageExtensionMap: Record<string, Language> = {};

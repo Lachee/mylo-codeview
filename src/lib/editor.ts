@@ -1,4 +1,4 @@
-import { type Language, hljs, registerLanguage, CodeEditor } from './hljs';
+import { type Language, hljs, registerLanguage, CodeEditor } from './highlight';
 
 //const HLJS_THEME = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css';
 const HLJS_THEME_DARK = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css';

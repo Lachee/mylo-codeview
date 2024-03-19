@@ -1,5 +1,5 @@
 import { Editor } from "../lib/editor";
-import { getLanguageFromExtension } from "../lib/hljs";
+import { getLanguageFromExtension } from "../lib/highlight";
 import { extname, findEvaluationEvidenceAssignment, poll as find } from "../lib/utility";
 
 class ActivityPage {

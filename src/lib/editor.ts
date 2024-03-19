@@ -1,4 +1,4 @@
-import { type Language, hljs, registerLanguage } from './hljs';
+import { type Language, hljs, registerLanguage, CodeEditor } from './hljs';
 
 //const HLJS_THEME = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css';
 const HLJS_THEME_DARK = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css';
@@ -11,10 +11,10 @@ div.d2l-consistent-eval-non-viewable { justify-content: start; height: calc(100%
 .hlsj-container { overflow: auto; }
 `;
 
-export class Editor {
+export class Editor implements CodeEditor {
 
     url: string = '';
-    code : string = '';
+    code: string = '';
     container: Element | null = null;
 
     _loadedStyle = false;
@@ -22,39 +22,45 @@ export class Editor {
     constructor() {
     }
 
-    async create(url: string, lang: Language|undefined, parent: Element): Promise<void> {
-        if (this.container != null && this.container.isConnected && this.container.getAttribute('data-url') === url) {
-            //console.log('cannot create another code view because one already exists', this.container);
-            return;
+    async create(url: string, lang: Language | undefined, parent: Element): Promise<void> {
+        // Are we already displaying this nonsense?
+        if (this.isDisplayingURL(url)) return;
+
+        // Create the preview
+        parent.innerHTML = '';
+        this.createCodeContainer(parent);
+        if (this.container == null) return;
+
+        // Download and display code
+        let code = await this.download(url);
+        if (lang !== undefined) {
+            registerLanguage(lang);
+            code = hljs.highlight(code, { language: lang.name }).value;
+        } else {
+            code = hljs.highlightAuto(code).value;
         }
 
+        this.container.innerHTML = `<pre><code class="hljs">${code}</code></pre>`;
+    }
+
+    isDisplayingURL(url: string): boolean {
+        return this.container != null && this.container.isConnected && this.container.getAttribute('data-url') === url
+    }
+
+    /** downloads the code */
+    async download(url: string): Promise<string> {
         // Download the code if we havn't done so already
         if (this.url !== url) {
-            console.log('downloading and displaying', url);
+            console.log('- downloading code at', url);
             this.url = url;
             this.code = await fetch(url).then(r => r.text());
-        } else { 
-            console.log('displaying', url);
+        } else {
+            console.log('- using cached code for', url);
         }
-        
-        // Create the code preview
-        this.createCodeContainer(parent);
-        if (this.container != null) {
-            let code = this.code;
-            if (lang !== undefined) {
-                registerLanguage(lang);
-                code = hljs.highlight(code, { language: lang.name }).value;
-            } else {
-                code = hljs.highlightAuto(code).value;
-            }
-
-            this.container.innerHTML = `<pre><code class="hljs">${code}</code></pre>`;
-        }
+        return this.code;
     }
 
     createCodeContainer(parent: Element) {
-        parent.innerHTML = '';
-
         // Add HLJS
         const hljsStyleTag = document.createElement('link');
         hljsStyleTag.setAttribute('rel', 'stylesheet');

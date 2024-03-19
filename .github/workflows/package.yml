@@ -37,15 +37,17 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: ButlerLogic/action-autotag@1.1.2 
+      name: Create tag from Manifest
       id: tagger
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       with:
         strategy: regex
-        root: public/manifest.json
+        root: "/public/manifest.json"
         regex_pattern: > 
           "version":\s*"([0-9]+\.[0-9]+\.[0-9]+)"
         tag_prefix: "v"
+    - run: echo "${{ steps.tagger.outputs.tagname }}"
     outputs:
       tag: ${{ steps.tagger.outputs.tagname }}
 

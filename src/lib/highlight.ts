@@ -1,6 +1,5 @@
 import { type LanguageFn } from 'highlight.js';
-import hljsAPI from 'highlight.js/lib/core';
-export const hljs = hljsAPI;
+import hljs from 'highlight.js/lib/core';
 
 import c from 'highlight.js/lib/languages/c';
 import cpp from 'highlight.js/lib/languages/cpp';
@@ -18,6 +17,19 @@ import swift from 'highlight.js/lib/languages/swift';
 import typeScript from 'highlight.js/lib/languages/typescript';
 import xml from 'highlight.js/lib/languages/xml';
 
+export const LINE_STYLE = `
+.hljs .line {
+    display: inline-block;
+    user-select: none;
+    pointer-events: none;
+    margin-right: 10px;
+    padding-right: 0.5em;
+    border-right: 1px solid gray;
+    color: gray;
+    width: 2em;
+    text-align: right;
+}
+`;
 
 // Declare the langauges
 const languages = [
@@ -42,8 +54,8 @@ const languages = [
 export type LanguageName = typeof languages[number]['name'];
 /** Programming language data */
 export type Language = {
-    name:   LanguageName,
-    ext:    Readonly<string>,
+    name: LanguageName,
+    ext: Readonly<string>,
     module: Readonly<LanguageFn>,
     alias?: Readonly<string[]>,
 
@@ -52,15 +64,17 @@ export type Language = {
 }
 
 export interface CodeEditor {
-    create(url: string, lang: Language|undefined, parent: Element): Promise<void>;
+    create(url: string, lang: Language | undefined, parent: Element): Promise<void>;
 }
 
 /** @ts-ignore we are ignoring the error this throws because it is convient */
-const _langauges : Language[] = languages;
+const _langauges: Language[] = languages;
 /** List of all available languages */
 export const Languages = _langauges;
 
 const _languageExtensionMap: Record<string, Language> = {};
+
+/** Gets a language from the given name */
 export function getLanguageFromExtension(ext: string): (Language | undefined) {
     if (ext.length == 0)
         return undefined;
@@ -80,6 +94,7 @@ export function getLanguageFromExtension(ext: string): (Language | undefined) {
     return undefined;
 }
 
+/** Registers all the languages for use */
 export function registerAllLanguages() {
     for (const lang of Languages)
         registerLanguage(lang);
@@ -99,4 +114,27 @@ export function registerLanguage(lang: Language) {
     aliases.push(lang.name);
     aliases.push("." + lang.ext);
     hljs.registerAliases(aliases, { languageName });
+}
+
+export function highlight(code: string, language: Language | undefined, lineNumbers: boolean): string {
+    if (language != undefined)
+        registerLanguage(language);
+
+    // Get the highlighted code
+    const highlight = language != undefined
+        ? hljs.highlight(code, { language: language.name }).value
+        : hljs.highlightAuto(code).value;
+
+    if (!lineNumbers)
+        return `<pre><code class="hljs">${highlight}</code></pre>`;
+
+    // Get the line numbers
+    let lineHTML = '';
+    const lines = highlight.split(/\n/);
+    for (let i = 0; i < lines.length; i++)
+        lineHTML += `<span class="line">${i + 1}</span>${lines[i]}\n`;
+    
+    return `<pre><code class="hljs">${lineHTML}</code></pre>`;
+    // Combine it all
+    //return `<pre><span class="line-numbers">${lineHTML}</span><code class="hljs">${highlight}</code></pre>`;
 }

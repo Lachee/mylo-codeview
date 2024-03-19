@@ -1,4 +1,4 @@
-import { type Language, hljs, registerLanguage, CodeEditor } from './highlight';
+import { type Language, CodeEditor, highlight, LINE_STYLE } from './highlight';
 
 //const HLJS_THEME = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css';
 const HLJS_THEME_DARK = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css';
@@ -9,7 +9,7 @@ const ADDITIONAL_STYLE = `
 code { text-align: left; font-size: 11pt; line-height: 11pt; }
 div.d2l-consistent-eval-non-viewable { justify-content: start; height: calc(100% - 55px); }
 .hlsj-container { overflow: auto; }
-`;
+` + LINE_STYLE;
 
 export class Editor implements CodeEditor {
 
@@ -33,14 +33,7 @@ export class Editor implements CodeEditor {
 
         // Download and display code
         let code = await this.download(url);
-        if (lang !== undefined) {
-            registerLanguage(lang);
-            code = hljs.highlight(code, { language: lang.name }).value;
-        } else {
-            code = hljs.highlightAuto(code).value;
-        }
-
-        this.container.innerHTML = `<pre><code class="hljs">${code}</code></pre>`;
+        this.container.innerHTML = highlight(code, lang, true);
     }
 
     isDisplayingURL(url: string): boolean {
@@ -68,7 +61,7 @@ export class Editor implements CodeEditor {
         parent.appendChild(hljsStyleTag);
 
         const additionalStyleTag = document.createElement('style');
-        additionalStyleTag.innerText = ADDITIONAL_STYLE;
+        additionalStyleTag.innerHTML = ADDITIONAL_STYLE;
         parent.appendChild(additionalStyleTag)
 
         // Add the editor box

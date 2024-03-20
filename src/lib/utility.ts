@@ -33,17 +33,31 @@ export function poll<T>(callback: () => T | undefined, pollRate: number = 150): 
     return new Promise<T>((resolve, reject) => {
         const interval = setInterval(() => {
             try {
+                console.log('polling...', callback);
                 const result = callback();
                 if (result !== undefined) {
                     clearInterval(interval);
                     resolve(result);
                 }
             } catch (e) {
+                console.error('failed to poll: ', e);
                 clearInterval(interval);
                 reject(e);
             }
         }, pollRate);
     });
+}
+
+/**
+ * Polls a callback until it returns a non-null result. The callback is run once before polling begins
+ * @param callback The function to poll a result for. If undefined, then the polling will continue.
+ * @param pollRate How often to check for a callback
+ * @returns 
+ */
+export async function find<T>(callback: () => T | null | undefined, pollRate: number = 150) : Promise<T> {
+    const result = callback();
+    if (result !== null && result !== undefined) return result;
+    return await poll(() => callback() ?? undefined, pollRate);
 }
 
 /** raw JS version 

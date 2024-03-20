@@ -1,6 +1,6 @@
 import { Editor } from "../lib/editor";
 import { getLanguageFromExtension } from "../lib/highlight";
-import { extname, findEvaluationEvidenceAssignment, poll as find } from "../lib/utility";
+import { extname, findEvaluationEvidenceAssignment, find } from "../lib/utility";
 
 class ActivityPage {
 
@@ -16,11 +16,14 @@ class ActivityPage {
         this._evaluationBox = null;
         this.editor = new Editor();
         this._observer = new MutationObserver(async (details) => {
-            if (this._semaphore != null)
+            if (this._semaphore != null) {
+                console.log('already tried creating a code editor, waiting...');
                 await this._semaphore;
+            }
 
             // Semaphore waits for the code editor
             this._semaphore = (async () => {
+                console.log('creating a code editor...');
                 await this.initializeCodeEditor();
             })();
         });
@@ -43,6 +46,7 @@ class ActivityPage {
             const box = findEvaluationEvidenceAssignment();
             if (box !== null && box.shadowRoot !== null)
                 return box.shadowRoot;
+            return null;
         });
 
         this._evaluationBox = shadowRoot;
@@ -58,7 +62,7 @@ class ActivityPage {
     /** tries to initialise the code editor */
     async initializeCodeEditor(): Promise<boolean> {
         if (this.evaluationBox == null) {
-            //console.log('no evaulation box available');
+            console.log('no evaulation box available');
             return false;
         }
 
@@ -66,7 +70,7 @@ class ActivityPage {
         const nonvisibleBox = this.evaluationBox.querySelector('d2l-consistent-evaluation-assignments-evidence-non-viewable');
         const shadowRoot = nonvisibleBox?.shadowRoot;
         if (nonvisibleBox == null || shadowRoot == null) {
-            //console.log('failed to find the non-visible box');
+            console.log('failed to find the non-visible box');
             return false;
         }
 
@@ -80,14 +84,13 @@ class ActivityPage {
 
         await this.createDownloadButton(shadowRoot, url, title);
         await this.createCodeViewer(shadowRoot, url, title);
-
         return true;
     }
 
     /** creates the code view for the given url */
     async createCodeViewer(frag: DocumentFragment, url: string, title: string) {
         // Get the visible box
-        const parent = await find<Element>(() => frag.querySelector('.d2l-consistent-eval-non-viewable') ?? undefined);
+        const parent = await find<Element>(() => frag.querySelector('.d2l-consistent-eval-non-viewable'));
 
         // Get the extension
         const ext = extname(title);
@@ -104,8 +107,8 @@ class ActivityPage {
     /** creates the download button for the given url */
     async createDownloadButton(frag: DocumentFragment, url: string, title: string) {
         // Get the visible top bar
-        const topbarRoot = await find<ShadowRoot>(() => frag.querySelector('d2l-consistent-evaluation-assignments-evidence-top-bar')?.shadowRoot ?? undefined);
-        const parent = await find<Element>(() => topbarRoot.querySelector('.d2l-consistent-evaluation-assignments-evidence-top-bar') ?? undefined);
+        const topbarRoot = await find<ShadowRoot>(() => frag.querySelector('d2l-consistent-evaluation-assignments-evidence-top-bar')?.shadowRoot);
+        const parent = await find<Element>(() => topbarRoot.querySelector('.d2l-consistent-evaluation-assignments-evidence-top-bar'));
         
         // Check for the button
         if (parent.querySelector('[name=download]') != null)

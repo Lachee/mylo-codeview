@@ -17,13 +17,11 @@ class ActivityPage {
         this.editor = new Editor();
         this._observer = new MutationObserver(async (details) => {
             if (this._semaphore != null) {
-                console.log('already tried creating a code editor, waiting...');
                 await this._semaphore;
             }
 
             // Semaphore waits for the code editor
             this._semaphore = (async () => {
-                console.log('creating a code editor...');
                 await this.initializeCodeEditor();
             })();
         });
@@ -62,15 +60,22 @@ class ActivityPage {
     /** tries to initialise the code editor */
     async initializeCodeEditor(): Promise<boolean> {
         if (this.evaluationBox == null) {
-            console.log('no evaulation box available');
+            //console.log('no evaulation box available');
             return false;
         }
 
-        // Get the shadow root
-        const nonvisibleBox = this.evaluationBox.querySelector('d2l-consistent-evaluation-assignments-evidence-non-viewable');
+        // Find the non visible box
+        const evaluationBox = this.evaluationBox;
+        const nonvisibleBox = await find<Element>(() => {
+            const nonvisibleBox = evaluationBox.querySelector('d2l-consistent-evaluation-assignments-evidence-non-viewable');
+            if (nonvisibleBox?.shadowRoot == null) return undefined;
+            return nonvisibleBox;
+        });
+
+        // Safety check
         const shadowRoot = nonvisibleBox?.shadowRoot;
-        if (nonvisibleBox == null || shadowRoot == null) {
-            console.log('failed to find the non-visible box');
+        if (nonvisibleBox == null || shadowRoot == null || !shadowRoot.isConnected) {
+            //console.log('failed to find the non-visible box');
             return false;
         }
 
@@ -90,7 +95,12 @@ class ActivityPage {
     /** creates the code view for the given url */
     async createCodeViewer(frag: DocumentFragment, url: string, title: string) {
         // Get the visible box
-        const parent = await find<Element>(() => frag.querySelector('.d2l-consistent-eval-non-viewable'));
+        const parent = await find<Element>(() => {
+            if (!frag.isConnected)
+                throw new Error('Document fragment is not connected');
+
+            return frag.querySelector('.d2l-consistent-eval-non-viewable')
+        }).catch(e => e);
 
         // Get the extension
         const ext = extname(title);
@@ -107,9 +117,15 @@ class ActivityPage {
     /** creates the download button for the given url */
     async createDownloadButton(frag: DocumentFragment, url: string, title: string) {
         // Get the visible top bar
-        const topbarRoot = await find<ShadowRoot>(() => frag.querySelector('d2l-consistent-evaluation-assignments-evidence-top-bar')?.shadowRoot);
+        const topbarRoot = await find<ShadowRoot>(() => {
+            if (!frag.isConnected)
+                throw new Error('Document fragment is not connected');
+
+            const elm = frag.querySelector('d2l-consistent-evaluation-assignments-evidence-top-bar');
+            return elm?.shadowRoot;
+        }).catch(e => e);
         const parent = await find<Element>(() => topbarRoot.querySelector('.d2l-consistent-evaluation-assignments-evidence-top-bar'));
-        
+
         // Check for the button
         if (parent.querySelector('[name=download]') != null)
             return;
@@ -123,7 +139,7 @@ class ActivityPage {
         d2lButton.setAttribute('title', title);
         d2lButton.setAttribute('download-url', url);
         d2lButton.addEventListener('click', () => window.open(url, '_BLANK'));
-        parent.appendChild(d2lButton);        
+        parent.appendChild(d2lButton);
     }
 }
 

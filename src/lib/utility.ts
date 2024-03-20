@@ -33,14 +33,13 @@ export function poll<T>(callback: () => T | undefined, pollRate: number = 150): 
     return new Promise<T>((resolve, reject) => {
         const interval = setInterval(() => {
             try {
-                console.log('polling...', callback);
                 const result = callback();
                 if (result !== undefined) {
                     clearInterval(interval);
                     resolve(result);
                 }
             } catch (e) {
-                console.error('failed to poll: ', e);
+                console.log('failed to poll: ', e);
                 clearInterval(interval);
                 reject(e);
             }

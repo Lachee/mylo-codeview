@@ -17,7 +17,13 @@ import swift from 'highlight.js/lib/languages/swift';
 import typeScript from 'highlight.js/lib/languages/typescript';
 import xml from 'highlight.js/lib/languages/xml';
 
-export const LINE_STYLE = `
+export const HLJS_STYLE = `
+pre code.hljs { 
+    padding-left: 0; 
+    text-align: left; 
+    font-size: 11pt; 
+    line-height: 11pt;
+}
 .hljs .line {
     display: inline-block;
     user-select: none;
@@ -28,6 +34,10 @@ export const LINE_STYLE = `
     color: gray;
     width: 2em;
     text-align: right;
+    position: sticky;
+    top: 0;
+    left: 0;
+    background: white;
 }
 `;
 

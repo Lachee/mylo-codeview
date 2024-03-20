@@ -1,4 +1,4 @@
-import { type Language, CodeEditor, highlight, LINE_STYLE } from './highlight';
+import { type Language, CodeEditor, highlight, HLJS_STYLE } from './highlight';
 
 //const HLJS_THEME = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css';
 const HLJS_THEME_DARK = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css';
@@ -6,10 +6,9 @@ const HLJS_THEME_LIGHT = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11
 const HLJS_THEME = HLJS_THEME_LIGHT;
 
 const ADDITIONAL_STYLE = `
-code { text-align: left; font-size: 11pt; line-height: 11pt; }
 div.d2l-consistent-eval-non-viewable { justify-content: start; height: calc(100% - 55px); }
 .hlsj-container { overflow: auto; }
-` + LINE_STYLE;
+` + HLJS_STYLE;
 
 export class Editor implements CodeEditor {
 
